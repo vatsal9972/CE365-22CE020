@@ -3,61 +3,60 @@
 
 using namespace std;
 
-string input;
-int pos = 0;
+class RDParser {
+    string input;
+    int pos;
 
+public:
+    RDParser(string str) : input(str), pos(0) {}
 
-bool S();
-bool L();
-bool L_D();
-
-bool S() {
-    if (input[pos] == '(') {  
-        pos++;
-        if (L()) {
-            if (input[pos] == ')') {
-                pos++;
+    bool S() {
+        if (match('a')) {
+            return true;
+        } else if (match('(')) {
+            if (L() && match(')')) {
                 return true;
             }
         }
-    } else if (input[pos] == 'a') {
-        pos++;
-        return true;
+        return false;
     }
-    return false;
-}
 
-bool L() {
-    if (S()) {
-        return L_D();
-    }
-    return false;
-}
-
-
-bool L_D(){
-    if(input[pos]==',')
-    {
-        pos++;
-        if(S())
-        {
-            L_D();
+    bool L() {
+        if (S()) {
+            return L_prime();
         }
         return false;
     }
-    return true;
-}
 
-int main() {
-    cout << "Enter a string: ";
-    cin >> input;  
-    pos = 0;
-
-    if (S() && pos == input.length()) {
-        cout << "Valid string\n";
-    } else {
-        cout << "Invalid string\n";
+    bool L_prime() {
+        if (match(',')) {
+            if (S()) {
+                return L_prime();
+            }
+            return false;
+        }
+        return true;
     }
 
+    bool match(char expected) {
+        if (pos < input.length() && input[pos] == expected) {
+            pos++;
+            return true;
+        }
+        return false;
+    }
+
+    bool parse() {
+        bool result = S();
+        return result && pos == input.length();
+    }
+};
+
+int main() {
+    string userInput;
+    cout << "Enter a string: ";
+    cin >> userInput;
+    RDParser parser(userInput);
+    cout << (parser.parse() ? "Valid string" : "Invalid string") << endl;
     return 0;
 }
